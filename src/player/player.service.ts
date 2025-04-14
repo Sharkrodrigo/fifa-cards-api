@@ -68,8 +68,8 @@ export class PlayerService {
                 }
                 
                 .card {
-                  width: 300px;
-                  height: 450px;
+                  width: 800px;
+                  height: 600px;
                   background-color: #1a1a1a;
                   border-radius: 15px;
                   overflow: hidden;
