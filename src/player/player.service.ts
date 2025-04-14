@@ -1,10 +1,7 @@
-// src/player/player.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as puppeteer from 'puppeteer';
 import { Player } from './player';
 import { CreatePlayerDto, UpdatePlayerDto } from './dto/player.dto';
@@ -169,13 +166,12 @@ export class PlayerService {
         await page.setViewport({
           width: 340,
           height: 500,
-          deviceScaleFactor: 2 // Para melhor qualidade
+          deviceScaleFactor: 2
         });
       
         await page.setContent(html);
         await page.waitForSelector('.card');
       
-        // Captura apenas o card, não a página inteira
         const cardElement = await page.$('.card');
         if (!cardElement) {
           throw new Error('Card element not found');
