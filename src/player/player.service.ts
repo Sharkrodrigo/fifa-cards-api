@@ -51,35 +51,143 @@ export class PlayerService {
     }
 
     async renderHtml(player: Player) {
-        const templatePath = path.join(__dirname, 'templates/card.html');
-        let html = fs.readFileSync(templatePath, 'utf8');
-
-        html = html
-            .replace(/{{nome}}/g, player.nome)
-            .replace(/{{fotourl}}/g, player.fotourl)
-            .replace(/{{posicao}}/g, player.posicao)
-            .replace(/{{overall}}/g, String(player.overall))
-            .replace(/{{stats\.pac}}/g, String(player.stats.pac))
-            .replace(/{{stats\.sho}}/g, String(player.stats.sho))
-            .replace(/{{stats\.pas}}/g, String(player.stats.pas))
-            .replace(/{{stats\.dri}}/g, String(player.stats.dri))
-            .replace(/{{stats\.def}}/g, String(player.stats.def))
-            .replace(/{{stats\.phy}}/g, String(player.stats.phy));
-
+        const html = `
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <title>FIFA Card</title>
+              <style>
+                @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+                
+                body {
+                  margin: 0;
+                  padding: 0;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  background-color: #f0f0f0;
+                  font-family: 'Roboto', sans-serif;
+                }
+                
+                .card {
+                  width: 300px;
+                  height: 450px;
+                  background-color: #1a1a1a;
+                  border-radius: 15px;
+                  overflow: hidden;
+                  position: relative;
+                  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  padding: 20px;
+                  box-sizing: border-box;
+                }
+                
+                .overall {
+                  font-size: 60px;
+                  font-weight: 900;
+                  color: gold;
+                  text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+                  margin-top: 20px;
+                  margin-bottom: 5px;
+                }
+                
+                .posicao {
+                  font-size: 24px;
+                  color: white;
+                  margin-bottom: 30px;
+                }
+                
+                .player-image {
+                  width: 150px;
+                  height: 150px;
+                  border-radius: 50%;
+                  object-fit: cover;
+                  border: 3px solid gold;
+                  margin-bottom: 20px;
+                }
+                
+                .nome {
+                  font-size: 28px;
+                  font-weight: 700;
+                  color: white;
+                  text-align: center;
+                  margin-bottom: 20px;
+                }
+                
+                .stats-grid {
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 10px;
+                  width: 100%;
+                }
+                
+                .stat {
+                  background-color: #333;
+                  color: white;
+                  padding: 8px 12px;
+                  border-radius: 5px;
+                  text-align: center;
+                  font-weight: 700;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="card">
+                <div class="overall">${player.overall}</div>
+                <div class="posicao">${player.posicao}</div>
+                
+                <img class="player-image" src="${player.fotourl}" alt="${player.nome}" />
+                
+                <div class="nome">${player.nome}</div>
+                
+                <div class="stats-grid">
+                  <div class="stat">PAC: ${player.stats.pac}</div>
+                  <div class="stat">SHO: ${player.stats.sho}</div>
+                  <div class="stat">PAS: ${player.stats.pas}</div>
+                  <div class="stat">DRI: ${player.stats.dri}</div>
+                  <div class="stat">DEF: ${player.stats.def}</div>
+                  <div class="stat">PHY: ${player.stats.phy}</div>
+                </div>
+              </div>
+            </body>
+          </html>
+        `;
+      
         return html;
-    }
-
-    async gerarCardImagem(player: Player): Promise<Buffer> {
-        const html = await this.renderHtml(player);
-      
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.setContent(html);
-      
-        const buffer = await page.screenshot() as Buffer;
-        await browser.close();
-      
-        return buffer;
       }
       
+      async gerarCardImagem(player: Player): Promise<Buffer> {
+        const html = await this.renderHtml(player);
+        const browser = await puppeteer.launch({
+          args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+        const page = await browser.newPage();
+        
+        await page.setViewport({
+          width: 340,
+          height: 500,
+          deviceScaleFactor: 2 // Para melhor qualidade
+        });
+      
+        await page.setContent(html);
+        await page.waitForSelector('.card');
+      
+        // Captura apenas o card, não a página inteira
+        const cardElement = await page.$('.card');
+        if (!cardElement) {
+          throw new Error('Card element not found');
+        }
+        
+        const buffer = await cardElement.screenshot({
+          type: 'png',
+          omitBackground: true
+        }) as Buffer;
+        
+        await browser.close();
+        return buffer;
+      }
+
 }
