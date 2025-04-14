@@ -44,7 +44,7 @@ export class PlayerController {
   })
   @Post()
   create(@Body() data: CreatePlayerDto) {
-    return this.service.create(data);
+    return this.service.create(data, data.usuarioId);
   }
 
   @ApiOperation({ summary: 'Atualizar um jogador existente' })

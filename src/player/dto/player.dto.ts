@@ -38,6 +38,12 @@ export class CreatePlayerDto {
     type: PlayerStatsDto
   })
   stats: PlayerStatsDto;
+
+  @ApiProperty({
+    description: 'ID do usuário dono do jogador',
+    example: 1,
+  })
+  usuarioId: number;
 }
 
 export class UpdatePlayerDto extends CreatePlayerDto {}

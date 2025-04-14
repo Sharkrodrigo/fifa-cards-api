@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from 'src/user/user';
 
 @Entity()
 export class Player {
@@ -31,8 +32,8 @@ export class Player {
       pas: 86,
       dri: 94,
       def: 36,
-      phy: 68
-    }
+      phy: 68,
+    },
   })
   @Column('json')
   stats: {
@@ -43,4 +44,8 @@ export class Player {
     def: number;
     phy: number;
   };
+
+  // Relacionamento ManyToOne com a entidade User
+  @ManyToOne(() => User, (user) => user.jogadores)
+  user: User; // Relacionamento com a entidade User (um jogador pertence a um usuário)
 }
