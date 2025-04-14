@@ -12,7 +12,7 @@ import { Player } from './player/player';
       port: 5432,
       username: 'postgres',
       password: 'password',
-      database: 'fifa_cards',
+      database: 'mercefut_app',
       entities: [Player],
       synchronize: true,
     }),
