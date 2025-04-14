@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Param, Put, Delete } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto/user.dto';
 import { User } from './user';
 
 
@@ -71,5 +71,14 @@ export class UserController {
   @ApiResponse({ status: 204, description: 'Usuário removido com sucesso' })
   async remove(@Param('id') id: number): Promise<void> {
     return this.userService.remove(id);
+  }
+
+  @Post('login')
+  @ApiOperation({ summary: 'Login de usuário' })
+  @ApiBody({ type: LoginUserDto })
+  @ApiResponse({ status: 200, description: 'Login bem-sucedido', type: User })
+  @ApiResponse({ status: 401, description: 'Credenciais inválidas' })
+  login(@Body() loginDto: LoginUserDto) {
+    return this.userService.login(loginDto.email, loginDto.senha);
   }
 }
