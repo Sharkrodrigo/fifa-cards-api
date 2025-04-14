@@ -24,3 +24,14 @@ export class UpdateUserDto {
     @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
     senha?: string;
 }
+
+export class LoginUserDto {
+    @ApiProperty({ description: 'O e-mail do usuário', example: 'usuario@example.com' })
+    @IsEmail()
+    email: string;
+  
+    @ApiProperty({ description: 'A senha do usuário', example: 'senha123' })
+    @IsString()
+    @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
+    senha: string;
+}
