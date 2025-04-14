@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as puppeteer from 'puppeteer';
 import { Player } from './player';
+import { CreatePlayerDto, UpdatePlayerDto } from './dto/player.dto';
 
 @Injectable()
 export class PlayerService {
@@ -15,24 +16,37 @@ export class PlayerService {
         private repo: Repository<Player>,
     ) { }
 
-    findAll() {
+    async findAll(): Promise<Player[]> {
         return this.repo.find();
     }
 
-    findOne(id: number) {
-        return this.repo.findOneBy({ id });
+    async findOne(id: number): Promise<Player> {
+        const player = await this.repo.findOneBy({ id });
+        if (!player) {
+            throw new NotFoundException(`Jogador com ID ${id} não encontrado`);
+        }
+        return player;
     }
 
-    create(data: Partial<Player>) {
+    async create(data: CreatePlayerDto): Promise<Player> {
         const player = this.repo.create(data);
         return this.repo.save(player);
     }
 
-    update(id: number, data: Partial<Player>) {
-        return this.repo.update(id, data);
+    async update(id: number, data: UpdatePlayerDto) {
+        const player = await this.findOne(id);
+        if (!player) {
+            throw new NotFoundException(`Jogador com ID ${id} não encontrado`);
+        }
+        await this.repo.update(id, data);
+        return { ...player, ...data };
     }
 
-    delete(id: number) {
+    async delete(id: number) {
+        const player = await this.findOne(id);
+        if (!player) {
+            throw new NotFoundException(`Jogador com ID ${id} não encontrado`);
+        }
         return this.repo.delete(id);
     }
 
