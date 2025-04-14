@@ -196,4 +196,13 @@ export class PlayerService {
     await browser.close();
     return buffer;
   }
+
+  async findByUserId(userId: number): Promise<Player[]> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`Usuário com ID ${userId} não encontrado`);
+    }
+  
+    return this.repo.find({ where: { user: { id: userId } }, relations: ['user'] });
+  }
 }
