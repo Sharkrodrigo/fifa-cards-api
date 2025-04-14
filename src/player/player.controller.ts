@@ -8,11 +8,11 @@ import { CreatePlayerDto, UpdatePlayerDto } from './dto/player.dto';
 @ApiTags('players')
 @Controller('players')
 export class PlayerController {
-  constructor(private readonly service: PlayerService) {}
+  constructor(private readonly service: PlayerService) { }
 
   @ApiOperation({ summary: 'Listar todos os jogadores' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Lista de jogadores retornada com sucesso',
     type: Player,
     isArray: true
@@ -24,8 +24,8 @@ export class PlayerController {
 
   @ApiOperation({ summary: 'Obter um jogador pelo ID' })
   @ApiParam({ name: 'id', description: 'ID do jogador' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Jogador encontrado com sucesso',
     type: Player
   })
@@ -37,21 +37,21 @@ export class PlayerController {
 
   @ApiOperation({ summary: 'Criar um novo jogador' })
   @ApiBody({ type: CreatePlayerDto })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Jogador criado com sucesso',
     type: Player
   })
   @Post()
   create(@Body() data: CreatePlayerDto) {
-    return this.service.create(data);
+    return this.service.create(data, data.usuarioId);
   }
 
   @ApiOperation({ summary: 'Atualizar um jogador existente' })
   @ApiParam({ name: 'id', description: 'ID do jogador' })
   @ApiBody({ type: UpdatePlayerDto })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Jogador atualizado com sucesso'
   })
   @ApiResponse({ status: 404, description: 'Jogador não encontrado' })
@@ -62,8 +62,8 @@ export class PlayerController {
 
   @ApiOperation({ summary: 'Excluir um jogador' })
   @ApiParam({ name: 'id', description: 'ID do jogador' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Jogador excluído com sucesso'
   })
   @ApiResponse({ status: 404, description: 'Jogador não encontrado' })
@@ -74,8 +74,8 @@ export class PlayerController {
 
   @ApiOperation({ summary: 'Obter o HTML do card do jogador' })
   @ApiParam({ name: 'id', description: 'ID do jogador' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'HTML do card retornado com sucesso',
     content: {
       'text/html': {
@@ -97,8 +97,8 @@ export class PlayerController {
 
   @ApiOperation({ summary: 'Obter a imagem do card do jogador' })
   @ApiParam({ name: 'id', description: 'ID do jogador' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Imagem do card retornada com sucesso',
     content: {
       'image/png': {
@@ -116,5 +116,18 @@ export class PlayerController {
     const buffer = await this.service.gerarCardImagem(player);
     res.setHeader('Content-Type', 'image/png');
     res.send(buffer);
+  }
+  @ApiOperation({ summary: 'Listar jogadores de um usuário' })
+  @ApiParam({ name: 'userId', description: 'ID do usuário' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de jogadores do usuário retornada com sucesso',
+    type: Player,
+    isArray: true
+  })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
+  @Get('user/:userId')
+  findByUserId(@Param('userId') userId: string) {
+    return this.service.findByUserId(+userId);
   }
 }
