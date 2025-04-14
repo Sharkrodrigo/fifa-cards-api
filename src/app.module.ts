@@ -8,11 +8,8 @@ import { Player } from './player/player';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '12345',
-      database: 'mercefut',
+      url: process.env.DATABASE_URL,
+      autoLoadEntities: true,
       entities: [Player],
       synchronize: true,
     }),
